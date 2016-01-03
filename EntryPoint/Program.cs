@@ -129,6 +129,29 @@ namespace EntryPoint
       IEnumerable<Vector2> specialBuildings, 
       IEnumerable<Tuple<Vector2, float>> housesAndDistances)
     {
+            float[,] specialBuildingsArray = new float [50,2];
+            var counter = 0;
+            foreach(var special in specialBuildings)
+            {
+                specialBuildingsArray[counter, 0] = special.X;
+                specialBuildingsArray[counter, 1] = special.Y;
+                counter++;
+                Console.WriteLine(special.X);
+            }
+            float[,] houseArray = new float[5,2];
+            int houseCounter = 0;
+            foreach (var house in housesAndDistances)
+            {
+                float distance = house.Item2;
+                houseArray[houseCounter, 0] = house.Item1.X;
+                houseArray[houseCounter, 1] = house.Item1.Y;
+            }
+            foreach(var cor in specialBuildingsArray)
+            {
+                    
+            }
+
+
       return
           from h in housesAndDistances
           select
@@ -137,7 +160,13 @@ namespace EntryPoint
             select s;
     }
 
-    private static IEnumerable<Tuple<Vector2, Vector2>> FindRoute(Vector2 startingBuilding, 
+        static public void kDtree(List<Vector2>test , int gemiddeld)
+        {
+
+
+        }
+
+        private static IEnumerable<Tuple<Vector2, Vector2>> FindRoute(Vector2 startingBuilding, 
       Vector2 destinationBuilding, IEnumerable<Tuple<Vector2, Vector2>> roads)
     {
       var startingRoad = roads.Where(x => x.Item1.Equals(startingBuilding)).First();
