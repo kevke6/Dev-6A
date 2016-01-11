@@ -62,14 +62,14 @@ namespace EntryPoint
                 huis++;
             }
             MergeSort_Recursive(arraytest, 0, arraytest.Length - 1);
-            List<Vector2> tester = new List<Vector2>();
+            List<Vector2> houseOrderList = new List<Vector2>();
             int i = 0;
             int j = 0;
             while (i < arraytest.Length) {
                
                 if (multiarray[j, 0] == arraytest[i])
                 {
-                    tester.Add(new Vector2(multiarray[j, 1], multiarray[j, 2]));
+                    houseOrderList.Add(new Vector2(multiarray[j, 1], multiarray[j, 2]));
                     i++;
                     j = 0;
                 }
@@ -77,7 +77,7 @@ namespace EntryPoint
                     j++;
                 }
             }
-              return tester;
+              return houseOrderList;
         }
 
         static public void DoMerge(int[] numbers, int left, int mid, int right)
@@ -129,15 +129,42 @@ namespace EntryPoint
       IEnumerable<Vector2> specialBuildings, 
       IEnumerable<Tuple<Vector2, float>> housesAndDistances)
     {
-            float[,] specialBuildingsArray = new float [50,2];
-            var counter = 0;
-            foreach(var special in specialBuildings)
+            float[,] specialBuildingsTree = new float [50,10];
+            foreach (var special in specialBuildings)
             {
-                specialBuildingsArray[counter, 0] = special.X;
-                specialBuildingsArray[counter, 1] = special.Y;
-                counter++;
-                Console.WriteLine(special.X);
+                var checker = 0;
+                while (checker < 50)
+                {
+                    if (special.X == specialBuildingsTree[checker, 0])
+                    {
+                        var counter = 2;
+                        while (counter < 10)
+                        {
+                            if (specialBuildingsTree[checker, counter] == 0)
+                            {
+                                specialBuildingsTree[checker, counter] = special.Y;
+                                counter = 11;
+                                checker = 51;
+                            }
+                            else
+                            {
+                                counter++;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (specialBuildingsTree[checker, 0] == 0)
+                        {
+                            specialBuildingsTree[checker, 0] = special.X;
+                            specialBuildingsTree[checker, 1] = special.Y;
+                            checker = 51;
+                        }
+                        else { checker++; }
+                    }
+                }
             }
+
             float[,] houseArray = new float[5,2];
             int houseCounter = 0;
             foreach (var house in housesAndDistances)
@@ -146,24 +173,48 @@ namespace EntryPoint
                 houseArray[houseCounter, 0] = house.Item1.X;
                 houseArray[houseCounter, 1] = house.Item1.Y;
             }
-            foreach(var cor in specialBuildingsArray)
+
+            var houseCounterHelper = 0;
+            List<Vector2> houseInDistance = new List<Vector2>();
+            foreach (var houseTest in housesAndDistances)
             {
-                    
+                
+                float distanceHelper = houseTest.Item2;
+                var counter = 0;
+                while (counter < 50)
+                {
+                    if (houseTest.Item1.X + distanceHelper >= specialBuildingsTree[counter, 0]
+                        && houseTest.Item1.X - distanceHelper <= specialBuildingsTree[counter, 0])
+                    {
+                        var checker = 1;
+                        while (checker < 10) {
+                            Console.WriteLine(houseTest.Item1.Y + "dit is de Y");
+                            Console.WriteLine(specialBuildingsTree[counter, checker]);
+                            if (houseTest.Item1.Y + distanceHelper >= specialBuildingsTree[counter, checker]
+                                && houseTest.Item1.Y - distanceHelper <= specialBuildingsTree[counter, checker])
+                            {
+                                houseInDistance.Add(new Vector2(specialBuildingsTree[counter,0],specialBuildingsTree[counter,checker]));
+                                checker++;
+                            }
+                            else { checker++; }
+                        }
+                        counter++;
+                    }
+                    else {
+                         if(specialBuildingsTree[counter,0] == 0) { counter = 51; } else { counter++; }
+                    }
+                }
+                houseCounterHelper++;
             }
 
-
-      return
-          from h in housesAndDistances
-          select
-            from s in specialBuildings
-            where Vector2.Distance(h.Item1, s) <= h.Item2
-            select s;
-    }
-
-        static public void kDtree(List<Vector2>test , int gemiddeld)
-        {
-
-
+           // yield return specialBuildings;
+            yield return houseInDistance;
+            //return
+            //    from h in housesAndDistances
+            //    select
+            //      from s in specialBuildings
+            //      where Vector2.Distance(h.Item1, s) <= h.Item2
+            //      select s;
         }
 
         private static IEnumerable<Tuple<Vector2, Vector2>> FindRoute(Vector2 startingBuilding, 
